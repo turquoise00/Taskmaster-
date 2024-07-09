@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">My App</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            User Tickets
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Ticket ID</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Work To be done</th>
+                        <!--<th scope="col">Actions</th>-->
+                    </tr>
+                </thead>
+                <tbody id="ticketTableBody">
+                    <!-- Existing ticket rows will be inserted here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{#if message}}
+    <h4 class="alert alert-danger mt-4">{{message}}</h4>
+    {{/if}}
+
+    <div class="mt-4">
+        <h5>Add New Task</h5>
+        <div class="form-row">
+            <div class="col">
+                <select id="newTaskWork" class="form-control">
+                    <option value="Task 1">Task 1</option>
+                    <option value="Task 2">Task 2</option>
+                    <option value="Task 3">Task 3</option>
+                    <option value="Task 4">Task 4</option>
+                    <option value="Task 5">Task 5</option>
+                </select>
+            </div>
+            <div class="col">
+                <select id="newTaskStatus" class="form-control">
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-success" onclick="addNewTask()">Add Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap and JavaScript libraries -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-RgYRjW0CNjQxlf2lFF7wu3zJG8kzPjz/ekIaIl2nZqNrFg8wJn2jwx2Xw5l5Rw5" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"></script>
+
+<script>
+   
+    function addNewTask() {
+        const newTaskWork = document.getElementById('newTaskWork').value;
+        const newTaskStatus = document.getElementById('newTaskStatus').value;
+
+        // Example fetch request to add a new ticket
+        fetch('/user/addTicket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ worktobedone: newTaskWork, status: newTaskStatus })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+
+            console.log('New ticket added successfully:', data);
+            getTicket(); // Refresh the ticket list after adding a new task
+        })
+        .catch(error => {
+            console.error('Error adding new ticket:', error);
+            // Handle error, show error message, etc.
+        });
+    }
+
+    function getTicket() {
+        fetch('/user/getTicket')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('ticketTableBody');
+                tableBody.innerHTML = ''; // Clear existing table rows
+                
+                data.forEach(item => {
+                    const row = `<tr>
+                        <td>${item.ticket_id}</td>
+                        <td>${item.status}</td>
+                        <td>
+                           ${item.worktobedone}
+                            </select>
+                        </td>
+                        <td>
+                        <!--    <button type="button" class="btn btn-danger btn-sm" onclick="deleteTicket(${item.ticket_id})">Delete</button> -->
+                        </td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            })
+            .catch(error => console.error('Error fetching tickets:', error));
+    }
+
+    // Initial call to fetch tickets when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        getTicket();
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+body{
+    background-color: rgb(199, 199, 221)
+}
+nav {
+    background-color:whitesmoke ;
+    color: #1b262c;
+    padding: 30px 60px;
+    display: flex;
+    justify-content: space-between;
+}
+
+nav ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+nav li {
+    list-style: none;
+}
+
+nav li a{
+    color: #1b262c;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 8px;
+}
+
+nav li a:hover {
+    color: #fff;
+    text-decoration: none;
+}
